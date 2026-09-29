@@ -1,0 +1,10 @@
+World transformation:
+- Translation (x,y,z) --> (x+0x, y+0y, z+0z)
+- Rotation (x, y, z) --> (dx*x, dy*y, dz*z)
+- Scale (x, y, z) --> (x, y) = x(1,0) +y(0,1)
+			(1,0)-->(0,1)
+			(0,1)-->(-1,0)
+			(x,y)-->x(0,1)+y(-1,0) -->(-y,x)
+			x(cos0, sin0) +y(-sin0, cos0)-->(xcos0-ysin0, xsin0+ycos0)
+			(x,y)	(cos0 sin0) <=(1,0)
+				(-sin0 cos0)<=(0,1)
