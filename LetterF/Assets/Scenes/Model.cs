@@ -20,7 +20,8 @@ public class Model
         addVertices();
         addTextureCoordinates();
         addFaces();
-        texture_coordinates = convertUV(1024);
+       texture_coordinates = convertUV(1024);
+
     }
     private List<Vector2> convertUV(float u)
     {
@@ -29,7 +30,18 @@ public class Model
         {
             temp.Add(new Vector2(v.x / u, 1 - v.y / u));
         }
-        return temp;
+            return temp;
+    }
+    private Rect woodRect = new Rect(0, 0, 1024, 1024); // x, y(from top), width, height
+
+    private Vector2 SideUV(Vector3 p, Vector3 n)
+    {
+        Vector3 t = Vector3.Cross(n, Vector3.forward).normalized; // along the edge
+        float u01 = (Vector3.Dot(p, t) + 9f) / 18f;  // position along the edge, 0-1
+        float v01 = (p.z + 1f) / 2f;                 // depth, 0-1
+        float px = woodRect.x + u01 * woodRect.width;
+        float py = woodRect.y + v01 * woodRect.height;
+        return new Vector2(px / 1024f, 1 - py / 1024f); // same conversion as your convertUV
     }
     private void addTextureCoordinates()
     {
@@ -198,9 +210,10 @@ public class Model
 
     public GameObject CreateUnityGameObject(Texture2D texture)
     {
+        //var uvs = convertUV(1130, 344);
         Mesh mesh = new Mesh();
         GameObject newGO = new GameObject();
-
+        
         MeshFilter mesh_filter = newGO.AddComponent<MeshFilter>();
         MeshRenderer mesh_renderer = newGO.AddComponent<MeshRenderer>();
 
@@ -209,17 +222,36 @@ public class Model
         List<Vector2> text_coords = new List<Vector2>();
         //List<Vector3> normalz = new List<Vector3>();
 
+        /*  for (int i = 0; i < faces.Count; i++)
+          {
+              //Vector3 normal_for_face = normals[i];
+
+              //normal_for_face = new Vector3(normal_for_face.x, normal_for_face.y, -normal_for_face.z);
+
+              coords.Add(vertices[faces[i].x]); dummy_indices.Add(i * 3); text_coords.Add(texture_coordinates[texture_index_list[i].x]);// normalz.Add(normal_for_face);
+
+              coords.Add(vertices[faces[i].y]); dummy_indices.Add(i * 3 + 2); text_coords.Add(texture_coordinates[texture_index_list[i].y]); //normalz.Add(normal_for_face);
+
+              coords.Add(vertices[faces[i].z]); dummy_indices.Add(i * 3 + 1); text_coords.Add(texture_coordinates[texture_index_list[i].z]); //normalz.Add(normal_for_face);
+          }*/
         for (int i = 0; i < faces.Count; i++)
         {
-            //Vector3 normal_for_face = normals[i];
+            Vector3 a = vertices[faces[i].x];
+            Vector3 b = vertices[faces[i].y];
+            Vector3 c = vertices[faces[i].z];
 
-            //normal_for_face = new Vector3(normal_for_face.x, normal_for_face.y, -normal_for_face.z);
+            Vector3 n = Vector3.Cross(b - a, c - a).normalized;
+            bool isSide = Mathf.Abs(n.z) < 0.01f;   // front/back faces point along z
 
-            coords.Add(vertices[faces[i].x]); dummy_indices.Add(i * 3); text_coords.Add(texture_coordinates[texture_index_list[i].x]);// normalz.Add(normal_for_face);
+            coords.Add(a); dummy_indices.Add(i * 3);
+            text_coords.Add(isSide ? SideUV(a, n) : texture_coordinates[texture_index_list[i].x]);
 
-            coords.Add(vertices[faces[i].y]); dummy_indices.Add(i * 3 + 2); text_coords.Add(texture_coordinates[texture_index_list[i].y]); //normalz.Add(normal_for_face);
+            coords.Add(b); dummy_indices.Add(i * 3 + 2);
+            text_coords.Add(isSide ? SideUV(b, n) : texture_coordinates[texture_index_list[i].y]);
 
-            coords.Add(vertices[faces[i].z]); dummy_indices.Add(i * 3 + 1); text_coords.Add(texture_coordinates[texture_index_list[i].z]); //normalz.Add(normal_for_face);
+            coords.Add(c); dummy_indices.Add(i * 3 + 1);
+            text_coords.Add(isSide ? SideUV(c, n) : texture_coordinates[texture_index_list[i].z]);
+            if (i == 0) Debug.Log(texture_coordinates[texture_index_list[0].x]);
         }
 
         mesh.vertices = coords.ToArray();
@@ -230,10 +262,11 @@ public class Model
         mesh.RecalculateBounds();
         mesh_filter.mesh = mesh;
 
-        Material material = new Material(Shader.Find("Standard"));
+        Material material = new Material(Shader.Find("Universal Render Pipeline/Lit"));
 
         material.mainTexture = texture;
         mesh_renderer.material = material;
+        material.mainTextureScale = new Vector2(5, 5);
         return newGO;
     }
 
