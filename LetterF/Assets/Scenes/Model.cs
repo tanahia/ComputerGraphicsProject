@@ -9,6 +9,7 @@ public class Model
 {
   internal  List<Vector3Int> faces = new List<Vector3Int>();
    internal List<Vector3> vertices = new List<Vector3>();
+    internal List<Vector3> normals = new List<Vector3>();
 
     private List<Vector2> texture_coordinates;
     private List<Vector3Int> texture_index_list;
@@ -20,21 +21,21 @@ public class Model
         addVertices();
         addTextureCoordinates();
         addFaces();
-       texture_coordinates = convertUV(1024);
+       texture_coordinates = convertUV(1152,1030);
 
     }
-    private List<Vector2> convertUV(float u)
+    private List<Vector2> convertUV(float rx, float ry)
     {
         List<Vector2> temp = new List<Vector2>();
         foreach (var v in texture_coordinates)
         {
-            temp.Add(new Vector2(v.x / u, 1 - v.y / u));
+            temp.Add(new Vector2(v.x / rx, 1 - v.y / ry));
         }
             return temp;
     }
-    private Rect woodRect = new Rect(0, 0, 1024, 1024); // x, y(from top), width, height
+    //private Rect woodRect = new Rect(0, 0, 1024, 1024); // x, y(from top), width, height
 
-    private Vector2 SideUV(Vector3 p, Vector3 n)
+   /* private Vector2 SideUV(Vector3 p, Vector3 n)
     {
         Vector3 t = Vector3.Cross(n, Vector3.forward).normalized; // along the edge
         float u01 = (Vector3.Dot(p, t) + 9f) / 18f;  // position along the edge, 0-1
@@ -42,7 +43,7 @@ public class Model
         float px = woodRect.x + u01 * woodRect.width;
         float py = woodRect.y + v01 * woodRect.height;
         return new Vector2(px / 1024f, 1 - py / 1024f); // same conversion as your convertUV
-    }
+    }*/
     private void addTextureCoordinates()
     {
         texture_coordinates.Add(new Vector2(755, 26));//0
@@ -76,9 +77,11 @@ public class Model
     {
         faces.Add(new Vector3Int(1, 2, 4));//0
         texture_index_list.Add(new Vector3Int(3,5,9));//0
+        normals.Add(new Vector3(0, 0, 1));
         faces.Add(new Vector3Int(3, 1, 4));//1
         texture_index_list.Add(new Vector3Int(8, 3, 9));//1
-        faces.Add(new Vector3Int(0, 1, 3));//2
+        normals.Add(new Vector3(0, 0, 1));
+        /*faces.Add(new Vector3Int(0, 1, 3));//2
         texture_index_list.Add(new Vector3Int(2, 3, 8));//2
         faces.Add(new Vector3Int(0, 3, 8));//3
         texture_index_list.Add(new Vector3Int(2, 8, 18));//3
@@ -168,7 +171,7 @@ public class Model
         faces.Add(new Vector3Int(22, 12, 10));//40
         texture_index_list.Add(new Vector3Int(21, 1, 22));//40
         faces.Add(new Vector3Int(12, 0, 10));//41
-        texture_index_list.Add(new Vector3Int(1, 2, 22));//41
+        texture_index_list.Add(new Vector3Int(1, 2, 22));//41 */
 
     }
     private void addVertices()
@@ -220,21 +223,21 @@ public class Model
         List<Vector3> coords = new List<Vector3>();
         List<int> dummy_indices = new List<int>();
         List<Vector2> text_coords = new List<Vector2>();
-        //List<Vector3> normalz = new List<Vector3>();
+        List<Vector3> normalz = new List<Vector3>();
 
-        /*  for (int i = 0; i < faces.Count; i++)
+          for (int i = 0; i < faces.Count; i++)
           {
-              //Vector3 normal_for_face = normals[i];
+              Vector3 normal_for_face = normals[i];
 
-              //normal_for_face = new Vector3(normal_for_face.x, normal_for_face.y, -normal_for_face.z);
+              normal_for_face = new Vector3(normal_for_face.x, normal_for_face.y, -normal_for_face.z);
 
-              coords.Add(vertices[faces[i].x]); dummy_indices.Add(i * 3); text_coords.Add(texture_coordinates[texture_index_list[i].x]);// normalz.Add(normal_for_face);
+              coords.Add(vertices[faces[i].x]); dummy_indices.Add(i * 3); text_coords.Add(texture_coordinates[texture_index_list[i].x]); normalz.Add(normal_for_face);
 
-              coords.Add(vertices[faces[i].y]); dummy_indices.Add(i * 3 + 2); text_coords.Add(texture_coordinates[texture_index_list[i].y]); //normalz.Add(normal_for_face);
+              coords.Add(vertices[faces[i].y]); dummy_indices.Add(i * 3 + 1); text_coords.Add(texture_coordinates[texture_index_list[i].z]); normalz.Add(normal_for_face);
 
-              coords.Add(vertices[faces[i].z]); dummy_indices.Add(i * 3 + 1); text_coords.Add(texture_coordinates[texture_index_list[i].z]); //normalz.Add(normal_for_face);
-          }*/
-        for (int i = 0; i < faces.Count; i++)
+              coords.Add(vertices[faces[i].z]); dummy_indices.Add(i * 3 + 2); text_coords.Add(texture_coordinates[texture_index_list[i].y]); normalz.Add(normal_for_face);
+          }
+       /* for (int i = 0; i < faces.Count; i++)
         {
             Vector3 a = vertices[faces[i].x];
             Vector3 b = vertices[faces[i].y];
@@ -243,7 +246,8 @@ public class Model
             Vector3 n = Vector3.Cross(b - a, c - a).normalized;
             bool isSide = Mathf.Abs(n.z) < 0.01f;   // front/back faces point along z
 
-            coords.Add(a); dummy_indices.Add(i * 3);
+            coords.Add(a); 
+            dummy_indices.Add(i * 3);
             text_coords.Add(isSide ? SideUV(a, n) : texture_coordinates[texture_index_list[i].x]);
 
             coords.Add(b); dummy_indices.Add(i * 3 + 2);
@@ -252,21 +256,21 @@ public class Model
             coords.Add(c); dummy_indices.Add(i * 3 + 1);
             text_coords.Add(isSide ? SideUV(c, n) : texture_coordinates[texture_index_list[i].z]);
             if (i == 0) Debug.Log(texture_coordinates[texture_index_list[0].x]);
-        }
+        }*/
 
         mesh.vertices = coords.ToArray();
         mesh.triangles = dummy_indices.ToArray();
         mesh.uv = text_coords.ToArray();
-        //mesh.normals = normalz.ToArray();
-        mesh.RecalculateNormals();
-        mesh.RecalculateBounds();
+        mesh.normals = normalz.ToArray();
+        //mesh.RecalculateNormals();
+        //mesh.RecalculateBounds();
         mesh_filter.mesh = mesh;
 
         Material material = new Material(Shader.Find("Universal Render Pipeline/Lit"));
 
         material.mainTexture = texture;
         mesh_renderer.material = material;
-        material.mainTextureScale = new Vector2(5, 5);
+       // material.mainTextureScale = new Vector2(5, 5);
         return newGO;
     }
 
