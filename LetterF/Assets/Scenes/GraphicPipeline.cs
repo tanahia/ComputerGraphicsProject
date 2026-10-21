@@ -47,7 +47,7 @@ public class GraphicsPipeline : MonoBehaviour
         //Display(imageAfterTranslation);
         Matrix4x4 singleMatrixOfTransformation = translationMatrix * scaleMatrix * rotationMatrix;
 
-       // Display(singleMatrixOfTransformation);
+       //Display(singleMatrixOfTransformation);
 
         Vector3 camPosition = new Vector3(23, 5, 52);
         Vector3 camLookAt = new Vector3(2, 3, 2);
@@ -63,7 +63,7 @@ public class GraphicsPipeline : MonoBehaviour
 
         List<Vector4> imageAfterSingleMatrix = MatrixTransform(singleMatrixOfTransformation, verts);
 
-        Display(imageAfterSingleMatrix);
+        //Display(imageAfterSingleMatrix);
 
 
     }
