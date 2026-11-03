@@ -43,11 +43,14 @@ public class GraphicsPipeline : MonoBehaviour
              Vector3.one
              );
         //Display(translationMatrix);
-        List<Vector4> imageAfterTranslation = MatrixTransform(translationMatrix, verts);
+        List<Vector4> imageAfterTranslation = MatrixTransform(translationMatrix, imageAfterScale);
         //Display(imageAfterTranslation);
         Matrix4x4 singleMatrixOfTransformation = translationMatrix * scaleMatrix * rotationMatrix;
 
-       //Display(singleMatrixOfTransformation);
+      // Display(singleMatrixOfTransformation);
+
+        List<Vector4> imageAfterTransformation = MatrixTransform(singleMatrixOfTransformation, verts);
+       Display(imageAfterTransformation);
 
         Vector3 camPosition = new Vector3(23, 5, 52);
         Vector3 camLookAt = new Vector3(2, 3, 2);
