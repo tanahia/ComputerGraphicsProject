@@ -7,6 +7,7 @@ using static UnityEditor.Searcher.SearcherWindow.Alignment;
 public class GraphicsPipeline : MonoBehaviour
 {
     public Texture2D texture;
+    public Outcode outcode;
     void Start()
     {
         Model myModel = new Model();
@@ -68,7 +69,70 @@ public class GraphicsPipeline : MonoBehaviour
 
         //Display(imageAfterSingleMatrix);
 
+        //Test Outcodes
+        Outcode oc1 = new Outcode(new Vector2(-1, 1.5f));
+        Outcode oc2 = new Outcode(new Vector2(1.8f, 1.2f));
+        oc1.display();
+        oc2.display();
+        (oc1 + oc2).display();
+        (oc1 * oc2).display();
 
+    }
+    public bool LineClip(ref Vector2 start, ref Vector2 end)
+    {
+        Outcode startCode = new Outcode(start);
+        Outcode endCode = new Outcode(end);
+        Outcode inViewport = new Outcode();
+
+        //trivially accepted
+        if((startCode + endCode) == inViewport)
+        {
+            return true;
+        }
+        //trivially rejected
+        if((startCode * endCode) != inViewport)
+        {
+            return false;
+        }
+
+        if(startCode == inViewport)
+        {
+            return LineClip(ref end, ref start);
+        }
+       //if we are here start is not in viewport
+       //if(x1=x0){top or bottom, return(x1,1 (x1, -1)}
+
+        float m= (end.y - start.y) / (end.x - start.x);
+
+        if (startCode.up)
+        {
+            // clip with top edge, y=1
+            start.x = start.x + (1 - start.y) / m;
+            start.y = 1;
+            return LineClip(ref start, ref end);
+        }
+        if(startCode.down)
+        {
+            // clip with bottom edge, y=-1
+            start.x = start.x + (-1 - start.y) / m;
+            start.y = -1;
+            return LineClip(ref start, ref end);
+        }
+        if (startCode.right)
+        {
+            // clip with right edge, x=1
+            start.y = start.y + (1 - start.x) * m;
+            start.x = 1;
+            return LineClip(ref start, ref end);
+        }
+        if (startCode.left)
+        {
+            // clip with left edge, x=-1
+            start.y = start.y + (-1 - start.x) * m;
+            start.x = -1;
+            return LineClip(ref start, ref end);
+        }
+        return false;
     }
     private List<Vector4> Homog(List<Vector3> vertices)
     {
