@@ -51,7 +51,7 @@ public class GraphicsPipeline : MonoBehaviour
       // Display(singleMatrixOfTransformation);
 
         List<Vector4> imageAfterTransformation = MatrixTransform(singleMatrixOfTransformation, verts);
-       Display(imageAfterTransformation);
+      // Display(imageAfterTransformation);
 
         Vector3 camPosition = new Vector3(23, 5, 52);
         Vector3 camLookAt = new Vector3(2, 3, 2);
@@ -72,10 +72,64 @@ public class GraphicsPipeline : MonoBehaviour
         //Test Outcodes
         Outcode oc1 = new Outcode(new Vector2(-1, 1.5f));
         Outcode oc2 = new Outcode(new Vector2(1.8f, 1.2f));
-        oc1.display();
-        oc2.display();
-        (oc1 + oc2).display();
-        (oc1 * oc2).display();
+       // oc1.display();
+        //oc2.display();
+       // (oc1 + oc2).display();
+        //(oc1 * oc2).display();
+
+        //Not in Viewport
+        Vector2 lineStart1 = new Vector2( 0.5f, -2);
+        Vector2 lineEnd1 = new Vector2(1, -2);
+
+        Vector2 lineStart2 = new Vector2(0.5f, 2);
+        Vector2 lineEnd2 = new Vector2(1, 2);
+
+        Vector2 lineStart3 = new Vector2( -2, 0.5f);
+        Vector2 lineEnd3 = new Vector2( -2, 1);
+
+        Vector2 lineStart4 = new Vector2(2, 0.5f);
+        Vector2 lineEnd4 = new Vector2(2, 1);
+
+        // In Viewport
+        Vector2 lineStart5 = new Vector2(0, 0);
+        Vector2 lineEnd5 = new Vector2(1, 1);
+
+        //Part of line in Viewport
+        //Clipped at top edge
+        Vector2 lineStart6 = new Vector2(0.1f, 2);
+        Vector2 lineEnd6 = new Vector2(0f, 0.5f);
+
+        //clipped at bottom edge
+        Vector2 lineStart7 = new Vector2(0.5f, 0.2f);
+        Vector2 lineEnd7 = new Vector2(0.7f, -2);
+
+        //clipped at right edge
+        Vector2 lineStart8 = new Vector2(2, 0.7f);
+        Vector2 lineEnd8 = new Vector2(0.5f, 0.4f);
+
+        //clipped at left edge
+        Vector2 lineStart9 = new Vector2(0.5f, 0.3f);
+        Vector2 lineEnd9 = new Vector2(0.7f, 2);
+
+        //Start and enpoint outside viewport but part of line inside viewport
+        Vector2 lineStart10 = new Vector2(0.7f, 2);
+        Vector2 lineEnd10 = new Vector2(0.5f, -2);
+
+        //Start and enpoint outside viewport but all line is outside viewport
+        Vector2 lineStart11 = new Vector2(-1, 2);
+        Vector2 lineEnd11 = new Vector2(1, 3);
+
+        print("Line: ("+lineStart1+", "+lineEnd1+") - "+LineClip(ref lineStart1, ref lineEnd1));
+        print("Line: ("+lineStart2+", "+lineEnd2+") - "+LineClip(ref lineStart2, ref lineEnd2));
+        print("Line: ("+lineStart3+", "+lineEnd3+") - "+LineClip(ref lineStart3, ref lineEnd3));
+        print("Line: ("+lineStart4+", "+lineEnd4+") - "+LineClip(ref lineStart4, ref lineEnd4));
+        print("Line: ("+lineStart5+", "+lineEnd5+") - "+LineClip(ref lineStart5, ref lineEnd5));
+        print("Line: ("+lineStart6+", "+lineEnd6+") - "+LineClip(ref lineStart6, ref lineEnd6));
+        print("Line: ("+lineStart7+", "+lineEnd7+") - "+LineClip(ref lineStart7, ref lineEnd7));
+        print("Line: ("+lineStart8+", "+lineEnd8+") - "+LineClip(ref lineStart8, ref lineEnd8));
+        print("Line: ("+lineStart9+", "+lineEnd9+") - "+LineClip(ref lineStart9, ref lineEnd9));
+        print("Line: (" + lineStart10 + ", " + lineEnd10 + ") - " + LineClip(ref lineStart10, ref lineEnd10));
+        print("Line: (" + lineStart11 + ", " + lineEnd11 + ") - " + LineClip(ref lineStart11, ref lineEnd11));
 
     }
     public bool LineClip(ref Vector2 start, ref Vector2 end)
@@ -109,6 +163,7 @@ public class GraphicsPipeline : MonoBehaviour
             // clip with top edge, y=1
             start.x = start.x + (1 - start.y) / m;
             start.y = 1;
+            print("Clipping with top edge: " + new Vector2(start.x, start.y));
             return LineClip(ref start, ref end);
         }
         if(startCode.down)
@@ -116,6 +171,7 @@ public class GraphicsPipeline : MonoBehaviour
             // clip with bottom edge, y=-1
             start.x = start.x + (-1 - start.y) / m;
             start.y = -1;
+            print("Clipping with bottom edge: "+new Vector2(start.x, start.y));
             return LineClip(ref start, ref end);
         }
         if (startCode.right)
@@ -123,6 +179,7 @@ public class GraphicsPipeline : MonoBehaviour
             // clip with right edge, x=1
             start.y = start.y + (1 - start.x) * m;
             start.x = 1;
+            print("Clipping with right edge: " + new Vector2(start.x, start.y));
             return LineClip(ref start, ref end);
         }
         if (startCode.left)
@@ -130,6 +187,7 @@ public class GraphicsPipeline : MonoBehaviour
             // clip with left edge, x=-1
             start.y = start.y + (-1 - start.x) * m;
             start.x = -1;
+            print("Clipping with left edge: " + new Vector2(start.x, start.y));
             return LineClip(ref start, ref end);
         }
         return false;
